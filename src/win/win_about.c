@@ -43,9 +43,9 @@ AboutDialogCreate(HWND hwnd)
     };
 
     wchar_t emu_version[256];
-    i = swprintf(emu_version, sizeof(emu_version), L"%ls v%ls", EMU_NAME_W, EMU_VERSION_FULL_W);
+    i = swprintf(emu_version, sizeof_w(emu_version), L"%ls v%ls", EMU_NAME_W, EMU_VERSION_FULL_W);
 #ifdef EMU_GIT_HASH
-    swprintf(&emu_version[i], sizeof(emu_version) - i, L" [%ls]", EMU_GIT_HASH_W);
+    swprintf(&emu_version[i], sizeof_w(emu_version) - i, L" [%ls]", EMU_GIT_HASH_W);
 #endif
 
     tdconfig.cbSize             = sizeof(tdconfig);
