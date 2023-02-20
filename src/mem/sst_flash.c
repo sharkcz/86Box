@@ -473,9 +473,6 @@ sst_init(const device_t *info)
     dev->is_39        = (dev->manufacturer == SST) && ((info->local & 0xff00) >= SST39SF512);
 
     dev->size = info->local & 0xffff0000;
-    if ((dev->size == 0x20000) && (strstr(machine_get_internal_name_ex(machine), "xi8088")) && !xi8088_bios_128kb())
-        dev->size = 0x10000;
-
     dev->mask         = dev->size - 1;
     dev->page_mask    = dev->mask & 0xffffff80; /* Filter out A0-A6. */
     dev->sdp          = 1;

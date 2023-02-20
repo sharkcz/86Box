@@ -31,7 +31,6 @@ typedef struct xi8088_t {
     uint8_t turbo;
 
     int turbo_setting;
-    int bios_128kb;
 } xi8088_t;
 
 static xi8088_t xi8088;
@@ -60,18 +59,11 @@ xi8088_turbo_set(uint8_t value)
         cpu_set();
 }
 
-int
-xi8088_bios_128kb(void)
-{
-    return xi8088.bios_128kb;
-}
-
 static void *
 xi8088_init(const device_t *info)
 {
     xi8088.turbo         = 1;
     xi8088.turbo_setting = device_get_config_int("turbo_setting");
-    xi8088.bios_128kb    = device_get_config_int("bios_128kb");
 
     mem_set_mem_state(0x0a0000, 0x20000, MEM_READ_EXTANY | MEM_WRITE_EXTANY);
     mem_set_mem_state(0x0c0000, 0x08000, device_get_config_int("umb_c0000h_c7fff") ? (MEM_READ_INTERNAL | MEM_WRITE_INTERNAL) : (MEM_READ_EXTANY | MEM_WRITE_EXTANY));
@@ -102,22 +94,6 @@ static const device_config_t xi8088_config[] = {
             }
         },
         .default_int = 0
-    },
-    {
-        .name = "bios_128kb",
-        .description = "BIOS size",
-        .type = CONFIG_SELECTION,
-        .selection = {
-            {
-                .description = "64KB starting from 0xF0000",
-                .value = 0
-            },
-            {
-                .description = "128KB starting from 0xE0000 (address MSB inverted, last 64KB first)",
-                .value = 1
-            }
-        },
-        .default_int = 1
     },
     {
         .name = "umb_c0000h_c7fff",
@@ -179,20 +155,13 @@ machine_xt_xi8088_init(const machine_t *model)
     int ret;
 
     if (bios_only) {
-        ret = bios_load_linear_inverted("roms/machines/xi8088/bios-xi8088-128k.bin",
+        ret = bios_load_linear_inverted("roms/machines/xi8088/bios-xi8088.bin",
                                         0x000e0000, 131072, 0);
-        ret |= bios_load_linear("roms/machines/xi8088/bios-xi8088.bin",
-                                0x000f0000, 65536, 0);
     } else {
         device_add(&xi8088_device);
 
-        if (xi8088_bios_128kb()) {
-            ret = bios_load_linear_inverted("roms/machines/xi8088/bios-xi8088-128k.bin",
-                                            0x000e0000, 131072, 0);
-        } else {
-            ret = bios_load_linear("roms/machines/xi8088/bios-xi8088.bin",
-                                   0x000f0000, 65536, 0);
-        }
+        ret = bios_load_linear_inverted("roms/machines/xi8088/bios-xi8088.bin",
+                                        0x000e0000, 131072, 0);
     }
 
     if (bios_only || !ret)
